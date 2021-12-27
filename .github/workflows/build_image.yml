@@ -21,4 +21,6 @@ jobs:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
       run: |
-        nix develop .#docker
+        nix develop .#docker 2>log_err.txt >log.txt
+    - name: Print
+      run: cat log_err.txt log.txt
