@@ -18,6 +18,13 @@
           text = ''
             import lightning_pb2 as ln
             import lightning_pb2_grpc as lnrpc
+            import chainnotifier_pb2 as chainnotifier
+            import chainnotifier_pb2_grpc as chainnotifier_grpc
+            import router_pb2 as router
+            import router_pb2_grpc as router_grpc
+            import invoices_pb2 as invoices
+            import invoices_pb2_grpc as invoices_grpc
+
             import grpc
             import os
             import sys
@@ -39,8 +46,9 @@
               cd $out
               cp -f ${lnrpc}/lnrpc/lightning.proto .
               cp -f ${lnrpc}/lnrpc/routerrpc/router.proto .
-              python -m grpc_tools.protoc --proto_path=${googleapis}:. --python_out=. --grpc_python_out=. lightning.proto
-              python -m grpc_tools.protoc --proto_path=${googleapis}:. --python_out=. --grpc_python_out=. router.proto
+              cp -f ${lnrpc}/lnrpc/chainrpc/chainnotifier.proto .
+              cp -f ${lnrpc}/lnrpc/invoicesrpc/invoices.proto .
+              for i in *.proto; do python -m grpc_tools.protoc --proto_path=${googleapis}:. --python_out=. --grpc_python_out=. $i; done
               rm -rf *.proto
             '';
           };
