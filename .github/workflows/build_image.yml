@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Build images
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2.4.0
@@ -16,11 +16,8 @@ jobs:
       with:
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - shell: bash
+    - name: Execute docker
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-      run: |
-        nix develop .#docker 2>log_err.txt >log.txt
-    - name: Print
-      run: cat log_err.txt log.txt
+      run: nix develop .#docker
