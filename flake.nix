@@ -10,7 +10,20 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        registry = "registry.digitalocean.com/fiksn/lnrpc-py";
+        registry = "fiksn/lnrpc-py";
+        pythonPackages = pkgs.python39Packages;
+        pythonBin = pkgs.python39;
+        test_imports = pkgs.writeTextFile {
+          name = "test_imports.py";
+          text = ''
+            import lightning_pb2 as ln
+            import lightning_pb2_grpc as lnrpc
+            import grpc
+            import os
+            import sys
+            sys.exit(0)
+         '';
+        };
       in
       rec {
         packages = flake-utils.lib.flattenTree {
@@ -18,7 +31,7 @@
             name = "lnrpc-py";
 
             phases = [ "buildPhase" ];
-            propagatedBuildInputs = with pkgs; with pkgs.python39Packages; [ python39 grpcio grpcio-tools googleapis-common-protos ];
+            propagatedBuildInputs = with pkgs; with pythonPackages; [ pythonBin grpcio grpcio-tools googleapis-common-protos ];
 
             buildPhase = ''
               mkdir -p $out
@@ -51,23 +64,23 @@
         defaultPackage = packages.lnrpc-py;
 
         devShell = pkgs.mkShell {
-          buildInputs = [ packages.lnrpc-py pkgs.python39Packages.protobuf pkgs.python39Packages.grpcio ];
+          buildInputs = with pythonPackages; [ packages.lnrpc-py protobuf grpcio ];
 
           shellHook = ''
-            echo "Hello ${packages.lnrpc-py}"
             PYTHONPATH=$PYTHONPATH:${packages.lnrpc-py}
+            python ${test_imports} || exit 1
+            echo "The built packages are available under ${packages.lnrpc-py}"
           '';
         };
 
         devShells.docker = pkgs.mkShell {
           buildInputs = [ pkgs.crane pkgs.gzip ];
           shellHook = ''
-            echo "docker load < ${packages.lnrpc-py-docker}"
-
-            if [ -n $DOCKER_USER ] && [ -n $DOCKER_PASS ]; then
+            if [ -n "$DOCKER_USER" ] && [ -n "$DOCKER_PASS" ]; then
               echo "Authenticating to registry..."
               actual=$(echo ${registry} | cut -d"/" -f1)
-              echo "Actual $actual"
+              # When there is no dot default to docker hub
+              echo $actual | grep -vq '\.' && actual="index.docker.io"
               crane auth login -u $DOCKER_USER -p $DOCKER_PASS $actual || true
             fi
 
@@ -77,9 +90,11 @@
             rm -rf $name
             gunzip $base
             # can't use parameter expansion since $ { } is nix magic
-            echo $name
-            crane push $name ${registry}
-            rm -rf $name
+            echo "crane push $name ${registry}"
+            crane push $name ${registry} && rm -rf $name
+
+            echo "If you want to play with the image do: "
+            echo "docker load < ${packages.lnrpc-py-docker}"
           '';
         };
 

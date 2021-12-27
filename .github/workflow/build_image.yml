@@ -1,0 +1,21 @@
+name: Rebuild and push docker image if flakes have changed
+
+on:
+  push:
+    paths:
+      - 'flake.nix'
+      - 'flake.lock'
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.0
+    - uses: cachix/install-nix-action@v15
+      with:
+        extra_nix_config: |
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+    - run: 
+        echo "DOCKER_USER=${{ secrets.DOCKER_USER }}" >> $GITHUB_ENV
+    - run:
+        echo "DOCKER_USER is $DOCKER_USER"
