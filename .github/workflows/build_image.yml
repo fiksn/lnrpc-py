@@ -19,6 +19,6 @@ jobs:
     - shell: bash
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
       run: |
-        echo "DOCKER_USER is $DOCKER_USER"
-        echo "hello"
+        nix develop .#docker
