@@ -5,6 +5,7 @@ on:
     paths:
       - 'flake.nix'
       - 'flake.lock'
+
 jobs:
   build:
     name: Build
@@ -15,7 +16,9 @@ jobs:
       with:
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - env:
+    - shell: bash
+      env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
-      run: 
-        - echo "DOCKER_USER is $DOCKER_USER"
+      run: |
+        echo "DOCKER_USER is $DOCKER_USER"
+        echo "hello"
