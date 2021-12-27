@@ -1,0 +1,76 @@
+{
+  "nodes": {
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1638122382,
+        "narHash": "sha256-sQzZzAbvKEqN9s0bzWuYmRaA03v40gaJ4+iL1LXjaeI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "74f7e4319258e287b0f9cb95426c9853b282730b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "googleapis": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1640207564,
+        "narHash": "sha256-4418MUW2qRf2EGs2Ky6+6QYdQvK1W9wjpBFFMZu5mOo=",
+        "owner": "googleapis",
+        "repo": "googleapis",
+        "rev": "e9744546b6b9c03f91b2b19c3c144d75d10812f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "googleapis",
+        "repo": "googleapis",
+        "type": "github"
+      }
+    },
+    "lnrpc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1640184291,
+        "narHash": "sha256-J2yGaOdtMJS/BeE2TVDAQd5UvHVPqmr4JtFlw2RXayg=",
+        "owner": "lightningnetwork",
+        "repo": "lnd",
+        "rev": "5d9b59ac5ade96467ddce4469c832fa3d8c481fe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lightningnetwork",
+        "repo": "lnd",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1640612837,
+        "narHash": "sha256-tM6pEnd89qkON1W9aeIEvcq4unHd4hHS9FPQhz6YMs4=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "73f18ebfff5aabd9035517341a05a0c04a66c29a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "googleapis": "googleapis",
+        "lnrpc": "lnrpc",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
