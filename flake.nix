@@ -48,7 +48,7 @@
           lnrpc-py-docker = pkgs.dockerTools.buildImage {
             name = registry;
             tag = "latest";
-            # TODO(fiction) - remove base image ...
+            # TODO(fiction) - remove base image
             fromImage = pkgs.dockerTools.buildImage {
               name = "bash";
               tag = "latest";
