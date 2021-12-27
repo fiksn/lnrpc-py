@@ -1,8 +1,10 @@
 # lnrpc-py
 LND RPC Python bindings
 
-It will build the stuff as described in [LND RPC Python](https://github.com/lightningnetwork/lnd/blob/master/docs/grpc/python.md)
+It will build the stuff as described in [LND RPC Python](https://github.com/lightningnetwork/lnd/blob/master/docs/grpc/python.md).
 It uses flakes to cache all git repos.
+
+You can obtain the built image from [fiksn/lnrpc-py](https://hub.docker.com/r/fiksn/lnrpc-py).
 
 Examples:
 
@@ -23,3 +25,4 @@ To start developing:
 $ nix develop
 $ python example.py
 ```
+

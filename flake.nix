@@ -84,16 +84,18 @@
               crane auth login -u $DOCKER_USER -p $DOCKER_PASS $actual || true
             fi
 
+            # Crane wants .tar
             cp -f ${packages.lnrpc-py-docker} .
             base=$(basename ${packages.lnrpc-py-docker})
             name=$(echo $base | rev | cut -d"." -f2- | rev)
             rm -rf $name
             gunzip $base
             # can't use parameter expansion since $ { } is nix magic
+
             echo "crane push $name ${registry}"
             crane push $name ${registry} && rm -rf $name
 
-            echo "If you want to play with the image do: "
+            echo "If you want to play with the image you should do: "
             echo "docker load < ${packages.lnrpc-py-docker}"
           '';
         };
