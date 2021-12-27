@@ -1,4 +1,4 @@
-name: Rebuild and push docker image if flakes have changed
+name: Rebuild and push imgs
 
 on:
   push:
