@@ -48,7 +48,7 @@
           lnrpc-py-docker = pkgs.dockerTools.buildImage {
             name = registry;
             tag = "latest";
-            # (TODO fiction - fix me)
+            # TODO(fiction) - fix me
             fromImage = pkgs.dockerTools.buildImage {
               name = "bash";
               tag = "latest";
