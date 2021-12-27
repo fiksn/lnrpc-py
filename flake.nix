@@ -8,7 +8,9 @@
 
   outputs = { self, nixpkgs, flake-utils, lnrpc, googleapis }:
     flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        registry = "registry.digitalocean.com/fiksn/lnrpc-py";
       in
       rec {
         packages = flake-utils.lib.flattenTree {
@@ -16,7 +18,7 @@
             name = "lnrpc-py";
 
             phases = [ "buildPhase" ];
-            buildInputs = with pkgs; with pkgs.python39Packages; [ python39 grpcio grpcio-tools googleapis-common-protos ];
+            propagatedBuildInputs = with pkgs; with pkgs.python39Packages; [ python39 grpcio grpcio-tools googleapis-common-protos ];
 
             buildPhase = ''
               mkdir -p $out
@@ -30,9 +32,9 @@
           };
         
           lnrpc-py-docker = pkgs.dockerTools.buildImage {
-            name = "fiksn/lnrpc-py";
+            name = registry;
             tag = "latest";
-            # Fix me
+            # (TODO fiction - fix me)
             fromImage = pkgs.dockerTools.buildImage {
               name = "bash";
               tag = "latest";
@@ -49,17 +51,35 @@
         defaultPackage = packages.lnrpc-py;
 
         devShell = pkgs.mkShell {
-          buildInputs = [ packages.lnrpc-py ];
+          buildInputs = [ packages.lnrpc-py pkgs.python39Packages.protobuf pkgs.python39Packages.grpcio ];
+
           shellHook = ''
             echo "Hello ${packages.lnrpc-py}"
+            PYTHONPATH=$PYTHONPATH:${packages.lnrpc-py}
           '';
         };
 
         devShells.docker = pkgs.mkShell {
-          buildInputs = [ pkgs.crane ];
+          buildInputs = [ pkgs.crane pkgs.gzip ];
           shellHook = ''
             echo "docker load < ${packages.lnrpc-py-docker}"
-            echo "docker run -it fiksn/lnrpc-py:latest bash"
+
+            if [ -n $DOCKER_USER ] && [ -n $DOCKER_PASS ]; then
+              echo "Authenticating to registry..."
+              actual=$(echo ${registry} | cut -d"/" -f1)
+              echo "Actual $actual"
+              crane auth login -u $DOCKER_USER -p $DOCKER_PASS $actual || true
+            fi
+
+            cp -f ${packages.lnrpc-py-docker} .
+            base=$(basename ${packages.lnrpc-py-docker})
+            name=$(echo $base | rev | cut -d"." -f2- | rev)
+            rm -rf $name
+            gunzip $base
+            # can't use parameter expansion since $ { } is nix magic
+            echo $name
+            crane push $name ${registry}
+            rm -rf $name
           '';
         };
 
