@@ -15,7 +15,7 @@ jobs:
       with:
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - run: 
-        echo "DOCKER_USER=${{ secrets.DOCKER_USER }}" >> $GITHUB_ENV
-    - run:
-        echo "DOCKER_USER is $DOCKER_USER"
+    - env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      run: 
+        - echo "DOCKER_USER is $DOCKER_USER"
