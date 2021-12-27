@@ -2,6 +2,7 @@
 LND RPC Python bindings
 
 It will build the stuff as described in [LND RPC Python](https://github.com/lightningnetwork/lnd/blob/master/docs/grpc/python.md)
+It uses flakes to cache all git repos.
 
 Examples:
 
@@ -17,8 +18,8 @@ To build and push docker image:
 nix develop .#docker
 ```
 
-To start developing
+To start developing:
 ```
-nix develop
-python example.py
+$ nix develop
+$ python example.py
 ```
