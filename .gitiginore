@@ -1,1 +1,9 @@
 result
+*.pem
+*.macaroon
+*.crt
+*.cert
+*private*
+*.tar
+*.tgz
+*.tar.gz
