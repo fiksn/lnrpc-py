@@ -30,7 +30,7 @@
             import sys
 
             sys.exit(0)
-         '';
+          '';
         };
       in
       rec {
@@ -52,7 +52,7 @@
               rm -rf *.proto
             '';
           };
-        
+
           lnrpc-py-docker = pkgs.dockerTools.buildImage {
             name = registry;
             tag = "latest";
@@ -67,7 +67,46 @@
               Cmd = [ "/bin/bash" ];
               WorkingDir = "${packages.lnrpc-py}";
             };
-         };
+          };
+
+          # Fake derivation used for its side effects (bad)
+          pushDocker = pkgs.stdenv.mkDerivation {
+            name = "pushDocker";
+
+            buildInputs = [ pkgs.crane pkgs.gzip pkgs.util-linux ];
+
+            phases = [ "buildPhase" ];
+
+            buildPhase =
+              let
+                docker_user = pkgs.lib.maybeEnv "DOCKER_USER" "";
+                docker_pass = pkgs.lib.maybeEnv "DOCKER_PASS" "";
+              in
+              pkgs.lib.optionalString
+                (docker_user != "" && docker_pass != "")
+                ''
+                  export HOME=$out
+                  echo "Authenticating to registry as user ${docker_user}..."
+                  actual=$(echo ${registry} | cut -d"/" -f1)
+                  # When there is no dot default to docker hub
+                  echo $actual | grep -vq '\.' && actual="index.docker.io"
+                  crane auth login -u ${docker_user} -p ${docker_pass} $actual || true
+                '' + ''
+                # Crane wants .tar
+                cp -f ${packages.lnrpc-py-docker} .
+                base=$(basename ${packages.lnrpc-py-docker})
+                name=$(echo $base | rev | cut -d"." -f2- | rev)
+                rm -rf $name
+                gunzip $base
+                # can't use parameter expansion since $ { } is nix magic
+ 
+                echo "crane push $name ${registry}"
+                crane push $name ${registry}
+                rm -rf $name
+                rm -rf $out/.docker
+                echo "done" > $out/data
+              '';
+          };
         };
 
         defaultPackage = packages.lnrpc-py;
@@ -82,32 +121,6 @@
           '';
         };
 
-        devShells.docker = pkgs.mkShell {
-          buildInputs = [ pkgs.crane pkgs.gzip ];
-          shellHook = ''
-            if [ -n "$DOCKER_USER" ] && [ -n "$DOCKER_PASS" ]; then
-              echo "Authenticating to registry..."
-              actual=$(echo ${registry} | cut -d"/" -f1)
-              # When there is no dot default to docker hub
-              echo $actual | grep -vq '\.' && actual="index.docker.io"
-              crane auth login -u $DOCKER_USER -p $DOCKER_PASS $actual || true
-            fi
 
-            # Crane wants .tar
-            cp -f ${packages.lnrpc-py-docker} .
-            base=$(basename ${packages.lnrpc-py-docker})
-            name=$(echo $base | rev | cut -d"." -f2- | rev)
-            rm -rf $name
-            gunzip $base
-            # can't use parameter expansion since $ { } is nix magic
-
-            echo "crane push $name ${registry}"
-            crane push $name ${registry} && rm -rf $name
-
-            echo "If you want to play with the image you should do: "
-            echo "docker load < ${packages.lnrpc-py-docker}"
-          '';
-        };
-
-     });
+      });
 }

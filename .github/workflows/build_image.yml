@@ -16,8 +16,8 @@ jobs:
       with:
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - name: Execute docker
-      #env:
-      #  DOCKER_USER: ${{ secrets.DOCKER_USER }}
-      #  DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-      run: nix develop .#docker
+    - name: Push image
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+      run: ./push.sh
