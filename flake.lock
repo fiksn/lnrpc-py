@@ -18,11 +18,11 @@
     "googleapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1640207564,
-        "narHash": "sha256-4418MUW2qRf2EGs2Ky6+6QYdQvK1W9wjpBFFMZu5mOo=",
+        "lastModified": 1640914877,
+        "narHash": "sha256-TGFnBBm0Po5YytOBy8VxEBBKDTd453/x4fPLG5MSIqQ=",
         "owner": "googleapis",
         "repo": "googleapis",
-        "rev": "e9744546b6b9c03f91b2b19c3c144d75d10812f9",
+        "rev": "73da6697f598f1ba30618924936a59f8e457ec89",
         "type": "github"
       },
       "original": {
@@ -49,11 +49,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1640695257,
-        "narHash": "sha256-aDp61nTW4kQCvhEZRPj+5MO+Up9+ssGx0zlG4r+Zm7g=",
+        "lastModified": 1640931409,
+        "narHash": "sha256-H81zjpdA36D/+szUhAxTz85BIwxF9rLrAhN07lyB+0w=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "c5d7d1a314270ccf32f941883e3cbb190e31dfa5",
+        "rev": "34cbc5789f1fc48453f173ef97b0b858bc0cd1af",
         "type": "github"
       },
       "original": {
