@@ -2,7 +2,7 @@ name: Update deps
 
 on:
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '0 6 * * 0'
 jobs:
   build:
     name: Update
@@ -17,7 +17,11 @@ jobs:
       run: nix flake update
     - name: Check
       run: nix flake check
-    - name: Commit changes
+    - name: Push to Cachix
+      env:
+        CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_KEY }}
+      run: nix-env -iA nixos.jq nixos.cachix && nix build --json | jq -r '.[].outputs | to_entries[].value' | cachix push fiksn
+    - name: Push to git
       run: |
         git config --global user.name 'Gregor Pogacnik'
         git config --global user.email '1640719+fiksn@users.noreply.github.com'
