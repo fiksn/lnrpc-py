@@ -13,14 +13,16 @@ jobs:
       with:
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+    - uses: cachix/cachix-action@v10
+      with:
+        name: fiksn
+        signingKey: '${{ secrets.CACHIX_KEY }}'
     - name: Update deps
       run: nix flake update
     - name: Check
       run: nix flake check
     - name: Push to Cachix
-      env:
-        CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_KEY }}
-      run: nix-env -iA nixos.jq nixos.cachix && nix build --json | jq -r '.[].outputs | to_entries[].value' | cachix push fiksn
+      run: nix build --json | jq -r '.[].outputs | to_entries[].value' | cachix push fiksn
     - name: Push to git
       run: |
         git config --global user.name 'Gregor Pogacnik'
