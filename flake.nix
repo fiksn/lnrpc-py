@@ -56,15 +56,9 @@
           lnrpc-py-docker = pkgs.dockerTools.buildImage {
             name = registry;
             tag = "latest";
-            # TODO(fiction) - remove base image ...
-            fromImage = pkgs.dockerTools.buildImage {
-              name = "bash";
-              tag = "latest";
-              contents = pkgs.bashInteractive;
-            };
-            contents = packages.lnrpc-py;
+            contents = [ packages.lnrpc-py pkgs.busybox ];
             config = {
-              Cmd = [ "/bin/bash" ];
+              Cmd = [ "/bin/sh" ];
               WorkingDir = "${packages.lnrpc-py}";
             };
           };
