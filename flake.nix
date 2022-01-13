@@ -11,8 +11,9 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         registry = "fiksn/lnrpc-py";
-        pythonPackages = pkgs.python39Packages;
+        isOk = pkg: !pkg.meta.broken && pkg.meta.available;
         pythonBin = pkgs.python39;
+        pythonPackages = pythonBin.pkgs;
         test_imports = pkgs.writeTextFile {
           name = "test_imports.py";
           text = ''
@@ -49,6 +50,10 @@
               cp -f ${lnrpc}/lnrpc/chainrpc/chainnotifier.proto .
               cp -f ${lnrpc}/lnrpc/invoicesrpc/invoices.proto .
               for i in *.proto; do python -m grpc_tools.protoc --proto_path=${googleapis}:. --python_out=. --grpc_python_out=. $i; done
+              # Just in case anybody wants a better naming
+              mkdir grpc_generated
+              touch grpc_generated/__init__.py
+              for i in *.py; do cp ./$i grpc_generated/$i; done
               rm -rf *.proto
             '';
           };
@@ -56,7 +61,7 @@
           lnrpc-py-docker = pkgs.dockerTools.buildImage {
             name = registry;
             tag = "latest";
-            contents = [ packages.lnrpc-py pkgs.busybox ];
+            contents = [ packages.lnrpc-py ] ++ (if isOk pkgs.busybox then [ pkgs.busybox ] else [ ]);
             config = {
               Cmd = [ "/bin/sh" ];
               WorkingDir = "${packages.lnrpc-py}";
@@ -93,7 +98,7 @@
                 rm -rf $name
                 gunzip $base
                 # can't use parameter expansion since $ { } is nix magic
- 
+
                 echo "crane push $name ${registry}"
                 crane push $name ${registry}
                 rm -rf $name
@@ -106,7 +111,7 @@
         defaultPackage = packages.lnrpc-py;
 
         devShell = pkgs.mkShell {
-          buildInputs = with pythonPackages; [ packages.lnrpc-py protobuf grpcio ];
+          buildInputs = with pythonPackages; [ packages.lnrpc-py protobuf grpcio pkgs.pre-commit ];
 
           shellHook = ''
             PYTHONPATH=$PYTHONPATH:${packages.lnrpc-py}
