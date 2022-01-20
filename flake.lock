@@ -18,11 +18,11 @@
     "googleapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1642040559,
-        "narHash": "sha256-bJFra7z/q4R0c6wp5ntqpkevlIHSo1IPigNQdiLb3WU=",
+        "lastModified": 1642638275,
+        "narHash": "sha256-6gxYSxBTzYGtdbDIMzmfNC5Jtih7zJ+1Gogrh8y8BeE=",
         "owner": "googleapis",
         "repo": "googleapis",
-        "rev": "e7aa1494257e326beb6798104fc6373d4c4fc4b8",
+        "rev": "9fe00a1330817b5ce00919bf2861cd8a9cea1a00",
         "type": "github"
       },
       "original": {
@@ -34,11 +34,11 @@
     "lnrpc": {
       "flake": false,
       "locked": {
-        "lastModified": 1641990196,
-        "narHash": "sha256-4TbaybIq2Csub+tBlrktDWBM75wfJ3ppX9K1HfKagzk=",
+        "lastModified": 1642667660,
+        "narHash": "sha256-DRZlvy5KApws7A392vC1uH5bkQ2auKG9ky2ixfOJRpg=",
         "owner": "lightningnetwork",
         "repo": "lnd",
-        "rev": "ed511bb37f267f62c3822137d260bd69d75407b7",
+        "rev": "ddaba02558f8bc55658eadc0b7d78bb70d978336",
         "type": "github"
       },
       "original": {
@@ -49,11 +49,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1642085116,
-        "narHash": "sha256-57l6RRQ0SP4JUWjkojNCqVUOQDRJWs2oYM14+FeAIcY=",
+        "lastModified": 1642666162,
+        "narHash": "sha256-rjtAd8nwm6Ea8V+RJKQ9gyR8qzQ/6rQIPCgXakCUt4c=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "2540943666d6cb380117752c697441352876101b",
+        "rev": "8fc6055ce7eef872f44519d82b15163671cf636c",
         "type": "github"
       },
       "original": {
