@@ -1,15 +1,18 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
+    nix2container.url = "github:nlewo/nix2container";
     flake-utils.url = "github:numtide/flake-utils";
     googleapis = { url = "github:googleapis/googleapis"; flake = false; };
     lnrpc = { url = "github:lightningnetwork/lnd?lnrpc"; flake = false; };
   };
 
-  outputs = { self, nixpkgs, flake-utils, lnrpc, googleapis }:
+  outputs = { self, nixpkgs, nix2container, flake-utils, lnrpc, googleapis }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+        nix2containerPkgs = nix2container.packages.${system};
+
         registry = "fiksn/lnrpc-py";
         isOk = pkg: !pkg.meta.broken && pkg.meta.available;
         pythonBin = pkgs.python39;
@@ -58,7 +61,7 @@
             '';
           };
 
-          lnrpc-py-docker = pkgs.dockerTools.buildImage {
+          lnrpc-py-docker = nix2containerPkgs.nix2container.buildImage {
             name = registry;
             tag = "latest";
             contents = [ packages.lnrpc-py ] ++ (if isOk pkgs.busybox then [ pkgs.busybox ] else [ ]);
@@ -72,7 +75,7 @@
           pushDocker = pkgs.stdenv.mkDerivation {
             name = "pushDocker";
 
-            buildInputs = [ pkgs.crane pkgs.gzip pkgs.util-linux ];
+            buildInputs = [ nix2containerPkgs.skopeo-nix2container ];
 
             phases = [ "buildPhase" ];
 
@@ -81,29 +84,9 @@
                 docker_user = pkgs.lib.maybeEnv "DOCKER_USER" "";
                 docker_pass = pkgs.lib.maybeEnv "DOCKER_PASS" "";
               in
-              pkgs.lib.optionalString
-                (docker_user != "" && docker_pass != "")
-                ''
-                  export HOME=$out
-                  echo "Authenticating to registry as user ${docker_user}..."
-                  actual=$(echo ${registry} | cut -d"/" -f1)
-                  # When there is no dot default to docker hub
-                  echo $actual | grep -vq '\.' && actual="index.docker.io"
-                  crane auth login -u ${docker_user} -p ${docker_pass} $actual || true
-                '' + ''
-                # Crane wants .tar
-                cp -f ${packages.lnrpc-py-docker} .
-                base=$(basename ${packages.lnrpc-py-docker})
-                name=$(echo $base | rev | cut -d"." -f2- | rev)
-                rm -rf $name
-                gunzip $base
-                # can't use parameter expansion since $ { } is nix magic
-
-                echo "crane push $name ${registry}"
-                crane push $name ${registry}
-                rm -rf $name
-                rm -rf $out/.docker
-                echo "done" > $out/data
+              ''
+                skopeo --insecure-policy copy --retry-times 5 --dest-creds ${docker_user}:${docker_pass} nix:${packages.lnrpc-py-docker} docker://${registry}
+                echo "done" > $out
               '';
           };
         };
