@@ -8,7 +8,7 @@
   };
 
   outputs = { self, nixpkgs, nix2container, flake-utils, lnrpc, googleapis }:
-    flake-utils.lib.eachDefaultSystem (system:
+    flake-utils.lib.eachSystem (builtins.filter (x: x != "i686-linux") flake-utils.lib.defaultSystems) (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         nix2containerPkgs = nix2container.packages.${system};
