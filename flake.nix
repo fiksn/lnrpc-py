@@ -61,6 +61,7 @@
             '';
           };
 
+          # Docker build
           lnrpc-py-docker = nix2containerPkgs.nix2container.buildImage {
             name = registry;
             tag = "latest";
