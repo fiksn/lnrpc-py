@@ -95,7 +95,7 @@
         defaultPackage = packages.lnrpc-py;
 
         devShell = pkgs.mkShell {
-          buildInputs = with pythonPackages; [ packages.lnrpc-py protobuf grpcio pkgs.pre-commit ];
+          buildInputs = with pythonPackages; [ packages.lnrpc-py protobuf grpcio pkgs.pre-commit ] ++ [pythonBin grpcio grpcio-tools googleapis-common-protos];
 
           shellHook = ''
             PYTHONPATH=$PYTHONPATH:${packages.lnrpc-py}
