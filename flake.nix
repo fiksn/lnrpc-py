@@ -15,7 +15,7 @@
 
         registry = "fiksn/lnrpc-py";
         isOk = pkg: !pkg.meta.broken && pkg.meta.available;
-        pythonBin = pkgs.python39;
+        pythonBin = pkgs.python310;
         pythonPackages = pythonBin.pkgs;
         test_imports = pkgs.writeTextFile {
           name = "test_imports.py";
@@ -24,10 +24,18 @@
             import lightning_pb2_grpc as lnrpc
             import chainnotifier_pb2 as chainnotifier
             import chainnotifier_pb2_grpc as chainnotifier_grpc
+            import chainkit_pb2 as chainkit
+            import chainkit_pb2_grpc as chainkit_grpc
             import router_pb2 as router
             import router_pb2_grpc as router_grpc
             import invoices_pb2 as invoices
             import invoices_pb2_grpc as invoices_grpc
+            import peers_pb2 as peers
+            import peers_pb2_grpc as peers_grpc
+            import signer_pb2 as signer
+            import signer_pb2_grpc as signer_grpc
+            import dev_pb2 as dev
+            import dev_pb2_grpc as dev_grpc
 
             import grpc
             import os
@@ -51,7 +59,13 @@
               cp -f ${lnrpc}/lnrpc/lightning.proto .
               cp -f ${lnrpc}/lnrpc/routerrpc/router.proto .
               cp -f ${lnrpc}/lnrpc/chainrpc/chainnotifier.proto .
+              cp -f ${lnrpc}/lnrpc/chainrpc/chainkit.proto .
               cp -f ${lnrpc}/lnrpc/invoicesrpc/invoices.proto .
+              cp -f ${lnrpc}/lnrpc/peersrpc/peers.proto .
+              cp -f ${lnrpc}/lnrpc/signrpc/signer.proto .
+              cp -f ${lnrpc}/lnrpc/devrpc/dev.proto .
+              cp -f ${lnrpc}/lnrpc/walletrpc/walletkit.proto .
+              mkdir -p signrpc ; cp -f signer.proto signrpc/
               for i in *.proto; do python -m grpc_tools.protoc --proto_path=${googleapis}:. --python_out=. --grpc_python_out=. $i; done
               # Just in case anybody wants a better naming
               mkdir grpc_generated
@@ -65,7 +79,11 @@
           lnrpc-py-docker = nix2containerPkgs.nix2container.buildImage {
             name = registry;
             tag = "latest";
-            contents = [ packages.lnrpc-py ] ++ (if isOk pkgs.busybox then [ pkgs.busybox ] else [ ]);
+            copyToRoot = pkgs.buildEnv {
+              name = "image-root";
+              paths = [ packages.lnrpc-py ] ++ (if isOk pkgs.busybox then [ pkgs.busybox ] else [ ]);
+              pathsToLink = [ "/bin" ];
+            };
             config = {
               Cmd = [ "/bin/sh" ];
               WorkingDir = "${packages.lnrpc-py}";
