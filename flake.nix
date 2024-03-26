@@ -2,6 +2,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
     nix2container.url = "github:nlewo/nix2container";
+    nix2container.inputs.nixpkgs.follows = "nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
     googleapis = { url = "github:googleapis/googleapis"; flake = false; };
     lnrpc = { url = "github:lightningnetwork/lnd?lnrpc"; flake = false; };
@@ -15,7 +16,7 @@
 
         registry = "fiksn/lnrpc-py";
         isOk = pkg: !pkg.meta.broken && pkg.meta.available;
-        pythonBin = pkgs.python310;
+        pythonBin = pkgs.python311;
         pythonPackages = pythonBin.pkgs;
         test_imports = pkgs.writeTextFile {
           name = "test_imports.py";
